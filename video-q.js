@@ -11,14 +11,19 @@ var sourceDir = '/Users/marc/github/photo/photos/videos/',
     targetDir = '/Users/marc/github/photo/target/videos/',
     globPattern = '**/*.@(mp4|MP4)';
 
-sourceFiles().then(function(files) { 
-  files.forEach(function(file) {
-    extractData(file).then(ensureTargetDirectories).then(moveFile);
-  });
-});
+fetchFiles().then(iterateFiles);
 
-function sourceFiles() {
+function iterateFiles(files) {
+  files.forEach(processFile);
+}
+
+function processFile(file) {
+  extractData(file).then(ensureTargetDirectories).then(moveFile);
+}
+
+function fetchFiles() {
   var deferred = Q.defer();
+
   glob(sourceDir + globPattern, function(error, sourceFiles) {
     if (error) {
       deferred.reject(new Error(error));
@@ -26,6 +31,7 @@ function sourceFiles() {
       deferred.resolve(sourceFiles);
     }
   });
+
   return deferred.promise;
 }
 
@@ -57,6 +63,7 @@ function ensureTargetDirectories(data) {
       deferred.resolve(data);
      }
   });
+
   return deferred.promise;
 }
 
